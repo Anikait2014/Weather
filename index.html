@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyCast | Weather Dashboard</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: #09111f;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  padding: 25px 16px;
+}
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: #65baff;
+}
+
+.tagline {
+  color: #8093ae;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.search-area {
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+input {
+  width: 210px;
+  background: #17253a;
+  border: 1px solid #293b55;
+  border-radius: 12px;
+  padding: 13px;
+  color: white;
+  outline: none;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+.search-btn {
+  background: #5aaeff;
+  color: #071321;
+  padding: 12px 17px;
+}
+
+.location-btn {
+  background: #1b2c44;
+  color: white;
+  padding: 12px;
+  font-size: 17px;
+}
+
+.suggestions {
+  position: absolute;
+  top: 53px;
+  left: 0;
+  width: 100%;
+  background: #1a2a40;
+  border: 1px solid #344b68;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.suggestion {
+  padding: 13px;
+  cursor: pointer;
+  color: #dce9fa;
+  font-size: 13px;
+}
+
+.suggestion:hover {
+  background: #2a405e;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.main-card {
+  background: linear-gradient(135deg, #173c62, #172c4d 60%, #26345f);
+  border: 1px solid #365779;
+  border-radius: 25px;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.main-card::after {
+  content: "☁";
+  position: absolute;
+  right: 25px;
+  bottom: -75px;
+  font-size: 230px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.city {
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.date {
+  color: #b3c8df;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.current-weather {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 35px;
+  position: relative;
+  z-index: 1;
+}
+
+.temperature {
+  font-size: clamp(65px, 12vw, 105px);
+  font-weight: 700;
+  letter-spacing: -7px;
+}
+
+.weather-description {
+  font-size: 18px;
+  color: #d5e8fa;
+  margin-top: 5px;
+}
+
+.weather-icon {
+  font-size: clamp(75px, 15vw, 125px);
+  filter: drop-shadow(0 10px 20px #0003);
+}
+
+.feels {
+  color: #b3c8df;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 28px 0 15px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  background: #142238;
+  border: 1px solid #263a55;
+  padding: 20px;
+  border-radius: 17px;
+}
+
+.stat-icon {
+  font-size: 23px;
+}
+
+.stat-name {
+  color: #8da2be;
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+.stat-value {
+  font-size: 21px;
+  font-weight: 700;
+  margin-top: 7px;
+}
+
+.hourly {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.hour {
+  min-width: 105px;
+  text-align: center;
+  background: #142238;
+  border: 1px solid #263a55;
+  border-radius: 16px;
+  padding: 18px 10px;
+}
+
+.hour-time {
+  font-size: 12px;
+  color: #91a7c3;
+}
+
+.hour-icon {
+  font-size: 28px;
+  margin: 15px 0;
+}
+
+.hour-temp {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.hour-rain {
+  color: #72bdff;
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+.forecast {
+  display: grid;
+  gap: 10px;
+}
+
+.day {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr 1fr;
+  align-items: center;
+  background: #142238;
+  border: 1px solid #263a55;
+  border-radius: 15px;
+  padding: 15px 18px;
+  gap: 10px;
+}
+
+.day-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.day-icon {
+  font-size: 25px;
+}
+
+.day-desc {
+  color: #8da2be;
+  font-size: 12px;
+  text-align: center;
+}
+
+.day-temp {
+  text-align: right;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+footer {
+  text-align: center;
+  color: #60738e;
+  font-size: 11px;
+  margin-top: 35px;
+  line-height: 1.8;
+}
+
+footer a {
+  color: #70baff;
+}
+
+.status {
+  color: #8da2be;
+  font-size: 13px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+@media(max-width: 650px) {
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .search-area {
+    width: 100%;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .main-card {
+    padding: 23px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .day {
+    grid-template-columns: 1fr 35px 1fr 1fr;
+    padding: 13px 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div>
+    <div class="logo">SKY<span>CAST</span> ☁</div>
+    <div class="tagline">YOUR WORLD. YOUR WEATHER.</div>
+  </div>
+
+  <div class="search-area">
+    <input id="cityInput" placeholder="Search a city..." autocomplete="off">
+    <button class="search-btn" id="searchBtn">Search</button>
+    <button class="location-btn" id="locationBtn" title="Use my location">📍</button>
+    <div class="suggestions hidden" id="suggestions"></div>
+  </div>
+</header>
+
+<div id="status" class="status">Loading weather...</div>
+
+<section class="main-card">
+  <div class="city" id="cityName">Lucknow, India</div>
+  <div class="date" id="dateText">Loading date...</div>
+
+  <div class="current-weather">
+    <div>
+      <div class="temperature" id="temperature">--°</div>
+      <div class="weather-description" id="description">Loading...</div>
+      <div class="feels" id="feels">Feels like --°</div>
+    </div>
+
+    <div class="weather-icon" id="weatherIcon">🌤️</div>
+  </div>
+</section>
+
+<div class="section-title">CURRENT CONDITIONS</div>
+
+<section class="stats">
+
+  <div class="stat">
+    <div class="stat-icon">💧</div>
+    <div class="stat-name">HUMIDITY</div>
+    <div class="stat-value" id="humidity">--%</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-icon">💨</div>
+    <div class="stat-name">WIND SPEED</div>
+    <div class="stat-value" id="wind">-- km/h</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-icon">☀️</div>
+    <div class="stat-name">UV INDEX</div>
+    <div class="stat-value" id="uv">--</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-icon">🌧️</div>
+    <div class="stat-name">PRECIPITATION</div>
+    <div class="stat-value" id="rain">-- mm</div>
+  </div>
+
+</section>
+
+<div class="section-title">HOURLY FORECAST</div>
+<section class="hourly" id="hourly">
+  <div class="status">Loading hourly forecast...</div>
+</section>
+
+<div class="section-title">5-DAY FORECAST</div>
+<section class="forecast" id="forecast">
+  <div class="status">Loading forecast...</div>
+</section>
+
+<footer>
+  WEATHER DATA PROVIDED BY
+  <a href="https://open-meteo.com/" target="_blank">OPEN-METEO</a>
+  <br>
+  SkyCast © 2026
+</footer>
+
+</div>
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+let currentLocation = {
+  name: "Lucknow",
+  country: "India",
+  latitude: 26.8467,
+  longitude: 80.9462
+};
+
+const weatherTypes = {
+  0: ["Clear sky", "☀️"],
+  1: ["Mainly clear", "🌤️"],
+  2: ["Partly cloudy", "⛅"],
+  3: ["Overcast", "☁️"],
+  45: ["Foggy", "🌫️"],
+  48: ["Rime fog", "🌫️"],
+  51: ["Light drizzle", "🌦️"],
+  53: ["Drizzle", "🌦️"],
+  55: ["Heavy drizzle", "🌧️"],
+  56: ["Freezing drizzle", "🌧️"],
+  57: ["Freezing drizzle", "🌧️"],
+  61: ["Light rain", "🌦️"],
+  63: ["Moderate rain", "🌧️"],
+  65: ["Heavy rain", "🌧️"],
+  66: ["Freezing rain", "🌧️"],
+  67: ["Freezing rain", "🌧️"],
+  71: ["Light snowfall", "🌨️"],
+  73: ["Snowfall", "❄️"],
+  75: ["Heavy snowfall", "❄️"],
+  77: ["Snow grains", "🌨️"],
+  80: ["Rain showers", "🌦️"],
+  81: ["Rain showers", "🌧️"],
+  82: ["Heavy showers", "⛈️"],
+  85: ["Snow showers", "🌨️"],
+  86: ["Heavy snow showers", "❄️"],
+  95: ["Thunderstorm", "⛈️"],
+  96: ["Thunderstorm with hail", "⛈️"],
+  99: ["Severe thunderstorm", "⛈️"]
+};
+
+function weatherInfo(code) {
+  return weatherTypes[code] || ["Unknown", "🌤️"];
+}
+
+function getDay(date) {
+  return new Date(date + "T12:00:00").toLocaleDateString(
+    "en-US",
+    { weekday: "long" }
+  );
+}
+
+function formatTime(time) {
+  return new Date(time).toLocaleTimeString(
+    "en-US",
+    { hour: "numeric" }
+  );
+}
+
+async function loadWeather() {
+  $("status").textContent = "Getting weather data...";
+
+  try {
+    const { latitude, longitude } = currentLocation;
+
+    const url =
+      "https://api.open-meteo.com/v1/forecast?" +
+      `latitude=${latitude}&longitude=${longitude}` +
+      "&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m" +
+      "&hourly=temperature_2m,precipitation_probability,weather_code" +
+      "&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max" +
+      "&forecast_days=5&timezone=auto";
+
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error("Weather service unavailable.");
+
+    const data = await response.json();
+
+    displayCurrent(data);
+    displayHourly(data);
+    displayForecast(data);
+
+    $("status").textContent = "Weather updated successfully ✓";
+
+  } catch (error) {
+    $("status").textContent =
+      "Unable to load weather. Check your internet connection and try again.";
+
+    console.error(error);
+  }
+}
+
+function displayCurrent(data) {
+  const c = data.current;
+  const d = data.daily;
+
+  const info = weatherInfo(c.weather_code);
+
+  $("cityName").textContent =
+    currentLocation.name + ", " + currentLocation.country;
+
+  $("dateText").textContent =
+    new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+  $("temperature").textContent =
+    Math.round(c.temperature_2m) + "°";
+
+  $("description").textContent = info[0];
+
+  $("weatherIcon").textContent = info[1];
+
+  $("feels").textContent =
+    "Feels like " + Math.round(c.apparent_temperature) + "°C";
+
+  $("humidity").textContent =
+    c.relative_humidity_2m + "%";
+
+  $("wind").textContent =
+    Math.round(c.wind_speed_10m) + " km/h";
+
+  $("rain").textContent =
+    c.precipitation + " mm";
+
+  $("uv").textContent =
+    d.uv_index_max[0];
+}
+
+function displayHourly(data) {
+  const hourly = data.hourly;
+  const currentTime = data.current.time;
+
+  let startIndex = hourly.time.findIndex(
+    time => time >= currentTime
+  );
+
+  if (startIndex < 0) startIndex = 0;
+
+  let html = "";
+
+  for (let i = startIndex; i < startIndex + 12; i++) {
+    if (i >= hourly.time.length) break;
+
+    const info = weatherInfo(hourly.weather_code[i]);
+
+    html += `
+      <div class="hour">
+        <div class="hour-time">
+          ${i === startIndex ? "NOW" : formatTime(hourly.time[i])}
+        </div>
+
+        <div class="hour-icon">${info[1]}</div>
+
+        <div class="hour-temp">
+          ${Math.round(hourly.temperature_2m[i])}°
+        </div>
+
+        <div class="hour-rain">
+          💧 ${hourly.precipitation_probability[i] ?? 0}%
+        </div>
+      </div>
+    `;
+  }
+
+  $("hourly").innerHTML = html;
+}
+
+function displayForecast(data) {
+  const d = data.daily;
+
+  let html = "";
+
+  for (let i = 0; i < d.time.length; i++) {
+    const info = weatherInfo(d.weather_code[i]);
+
+    html += `
+      <div class="day">
+        <div class="day-name">
+          ${i === 0 ? "Today" : getDay(d.time[i])}
+        </div>
+
+        <div class="day-icon">${info[1]}</div>
+
+        <div class="day-desc">${info[0]}</div>
+
+        <div class="day-temp">
+          ${Math.round(d.temperature_2m_max[i])}°
+          /
+          ${Math.round(d.temperature_2m_min[i])}°
+        </div>
+      </div>
+    `;
+  }
+
+  $("forecast").innerHTML = html;
+}
+
+// CITY SEARCH
+
+async function searchCity() {
+  const query = $("cityInput").value.trim();
+
+  if (!query) {
+    $("status").textContent = "Enter a city name first.";
+    return;
+  }
+
+  $("status").textContent = "Searching for city...";
+  $("suggestions").classList.add("hidden");
+
+  try {
+    const url =
+      "https://geocoding-api.open-meteo.com/v1/search?name=" +
+      encodeURIComponent(query) +
+      "&count=5&language=en&format=json";
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      $("status").textContent = "City not found. Try another name.";
+      return;
+    }
+
+    if (data.results.length === 1) {
+      chooseCity(data.results[0]);
+      return;
+    }
+
+    showSuggestions(data.results);
+
+  } catch (error) {
+    $("status").textContent = "Search failed. Please try again.";
+  }
+}
+
+function showSuggestions(results) {
+  const box = $("suggestions");
+
+  box.innerHTML = "";
+
+  results.forEach(place => {
+    const item = document.createElement("div");
+
+    item.className = "suggestion";
+
+    item.textContent =
+      place.name +
+      (place.admin1 ? ", " + place.admin1 : "") +
+      ", " + place.country;
+
+    item.onclick = () => chooseCity(place);
+
+    box.appendChild(item);
+  });
+
+  box.classList.remove("hidden");
+}
+
+function chooseCity(place) {
+  currentLocation = {
+    name: place.name,
+    country: place.country,
+    latitude: place.latitude,
+    longitude: place.longitude
+  };
+
+  $("cityInput").value = "";
+  $("suggestions").classList.add("hidden");
+
+  loadWeather();
+}
+
+$("searchBtn").onclick = searchCity;
+
+$("cityInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") searchCity();
+});
+
+$("cityInput").addEventListener("input", () => {
+  $("suggestions").classList.add("hidden");
+});
+
+// AUTOMATIC LOCATION
+
+$("locationBtn").onclick = () => {
+  if (!navigator.geolocation) {
+    $("status").textContent = "Location is not supported by your browser.";
+    return;
+  }
+
+  $("status").textContent = "Getting your location...";
+
+  navigator.geolocation.getCurrentPosition(
+    async position => {
+      currentLocation = {
+        name: "Your Location",
+        country: "",
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      };
+
+      loadWeather();
+    },
+
+    () => {
+      $("status").textContent =
+        "Location permission denied. Search for a city instead.";
+    }
+  );
+};
+
+// START WEBSITE
+
+loadWeather();
+
+</script>
+
+</body>
+</html>
